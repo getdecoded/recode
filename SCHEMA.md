@@ -6,20 +6,20 @@ This currently takes the form of a json file:
 
 ``` json
 {
-  "schema": 0.0.1,
+  "schema": "0.0.1",
   "files": [
     {
-      "path": "string",
-      "name": "string"
+      "path": "String",
+      "name": "String"
     }
   ],
   "recorded": [
     {    
-      "mode": Number,
-      "data": Object,
-      "position": {"row": Number, "col": Number},
-      "length": {"row": Number, "col": Number},
-      "distance": Number
+      "mode": "Number",
+      "data": "Object",
+      "position": {"row": "Number", "col": "Number"},
+      "length": {"row": "Number", "col": "Number"},
+      "distance": "Number"
     }
   ]
 }
