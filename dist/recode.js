@@ -54,12 +54,9 @@ var Recode = function(element, recorddata) {
 
         fileobj.path = filepath;
         fileobj.initialcontent = obj.innerHTML;
-        fileobj.textarea = document.createElement('textarea');
-        fileobj.textarea.innerHTML = fileobj.initialcontent;
+        fileobj.currentContent = obj.innerHTML;
 
         self.files.push(fileobj);
-
-        self.element.appendChild(fileobj.textarea);
         removearray.push(obj);
     });
 
@@ -67,6 +64,8 @@ var Recode = function(element, recorddata) {
         obj.parentNode.removeChild(obj);
     });
 
+    this.textarea = document.createElement('textarea');
+    this.textarea.innerHTML = this.files[0].currentContent;
 };
 
 Recode.prototype.render = function() {
