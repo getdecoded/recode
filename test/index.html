@@ -2,9 +2,42 @@
 <html>
     <head>
         <title>Recode Tests</title>
+        <link rel="stylesheet" href="../dist/recode.css" />
     </head>
     <body>
+        <div class="recode">
+            <pre><code data-filepath="Untitled.as"></code></pre>
+            <pre><code data-filepath="src/main.as">package
+{
+	import flash.display.Sprite;
+	import flash.events.Event;
 
+	/**
+	 * ...
+	 * @author Christian Silver
+	 */
+	public class Main extends Sprite
+	{
+
+		public function Main():void
+		{
+			if (stage) init();
+			else addEventListener(Event.ADDED_TO_STAGE, init);
+		}
+
+		private function init(e:Event = null):void
+		{
+			removeEventListener(Event.ADDED_TO_STAGE, init);
+			// entry point
+		}
+
+	}
+
+}
+</code></pre>
+        </div>
+        <script src="recorddata.js"></script>
         <script src="../dist/recode.js"></script>
+        <script>var recode = new Recode(document.querySelector('.recode'), recorddata);</script>
     </body>
 </html>

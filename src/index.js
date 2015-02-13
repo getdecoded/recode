@@ -1,2 +1,4 @@
 var Recode = require('./recode');
-Recode();
+
+window.Recode = Recode;
+
