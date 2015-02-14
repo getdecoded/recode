@@ -45,7 +45,7 @@ function nthIndex(str, pat, n){
 }
 
 function coordsToIndex(text, row, col) {
-    return nthIndex(text, '\n', row - 1) + 1 + col;
+    return nthIndex(text, '\n', row) + 1 + col;
 }
 
 function insertString(text, sub, position) {
@@ -54,6 +54,21 @@ function insertString(text, sub, position) {
 
 function removeString(text, pos1, pos2) {
     return text.slice(0, pos1) + text.slice(pos2);
+}
+
+// Thanks CMS
+// http://stackoverflow.com/a/499158/1136593
+function setSelectionRange(input, selectionStart, selectionEnd) {
+    if (input.setSelectionRange) {
+        input.focus();
+        input.setSelectionRange(selectionStart, selectionEnd);
+    } else if (input.createTextRange) {
+        var range = input.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', selectionEnd);
+        range.moveStart('character', selectionStart);
+        range.select();
+    }
 }
 
 var Recode = function(element, recorddata) {
@@ -69,7 +84,7 @@ var Recode = function(element, recorddata) {
     this.currentTime = 0;
     this.lastActionTime = 0;
     this.lastTime = 0;
-    this.lastTimestamp = new Date().getTime();
+    this.lastTimestamp = (new Date()).getTime();
     this.currentIndex = 0;
 
     var codeTags = this.element.getElementsByTagName('code'), removearray = [];
@@ -99,25 +114,29 @@ var Recode = function(element, recorddata) {
 };
 
 Recode.prototype.playrender = function() {
-    var now = new Date().getTime(),
-        difference = now - this.lastTimeStamp;
+    var now = (new Date()).getTime(),
+        difference = now - this.lastTimestamp,
+        self = this;
 
+    this.lastTimestamp = now;
     this.lastTime = this.currentTime;
-    this.currentTime += difference;
+    this.currentTime += difference * 10;
 
     this.render();
 
+
+
     if (this.playing) {
         this.requestid = requestAnimationFrame(function() {
-        Recode.prototype.render.call(self, this.playrender);
-    });
+            Recode.prototype.playrender.call(self);
+        });
     }
 };
 
 Recode.prototype.render = function() {
     var self = this;
 
-    for(i = this.currentTime + 1; i < this.recorddata.length; i ++) {
+    for(i = this.currentIndex + 1; i < this.recorddata.recorded.length; i ++) {
         var ev = this.recorddata.recorded[i],
             file = this.currentFile;
 
@@ -128,6 +147,7 @@ Recode.prototype.render = function() {
             switch (ev.mode) {
                 case 0:
                     // Insert text
+                    console.log('insert');
                     file.currentContent = insertString(file.currentContent, ev.data, coordsToIndex(file.currentContent, ev.position.row, ev.position.col));
                     break;
                 case 1:
@@ -135,12 +155,22 @@ Recode.prototype.render = function() {
                     file.currentContent = removeString(file.currentContent, coordsToIndex(file.currentContent, ev.position.row, ev.position.col), coordsToIndex(file.currentContent, ev.position.row + ev.length.row, ev.position.col + ev.length.col));
                     break;
                 case 2:
-                    // Chane selection
+                    // Change selection
+                    var first = coordsToIndex(file.currentContent, ev.position.row, ev.position.col),
+                        second = coordsToIndex(file.currentContent, ev.position.row + ev.length.row, ev.position.col + ev.length.col);
+
+                    if (first <= second) {
+                        setSelectionRange(this.textarea, first, second);
+                    } else {
+                        setSelectionRange(this.textarea, second, first);
+                    }
                     break;
                 case 3:
                     // Change file
                     this.files.forEach(function(file) {
+                        console.log(file.path, ev.data, file.path == ev.data);
                         if (file.path === ev.data) {
+
                             self.currentFile = file;
                         }
                     });
@@ -159,7 +189,7 @@ Recode.prototype.play = function() {
     var self = this;
     this.playing = true;
     this.requestid = requestAnimationFrame(function() {
-        Recode.prototype.render.call(self, this.playrender);
+        Recode.prototype.playrender.call(self);
     });
 };
 
