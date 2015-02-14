@@ -102,6 +102,7 @@ var Recode = function(element, recorddata) {
 
     this.currentFile = this.files[0];
     this.textarea = document.createElement('textarea');
+    this.textarea.setAttribute('disabled', true);
     this.textarea.innerHTML = this.files[0].currentContent;
     this.element.appendChild(this.textarea);
 };
@@ -152,10 +153,15 @@ Recode.prototype.render = function() {
                     var first = coordsToIndex(file.currentContent, ev.position.row, ev.position.col),
                         second = coordsToIndex(file.currentContent, ev.position.row + ev.length.row, ev.position.col + ev.length.col);
 
-                    if (first <= second) {
+                    if (first < second) {
                         setSelectionRange(this.textarea, first, second);
-                    } else {
+                    } else if (first > second) {
                         setSelectionRange(this.textarea, second, first);
+                    } else {
+                        // Disabled textareas don't like this
+                        // But the implementation is buggy anyway
+                        // So this is here as a reminder
+                        setSelectionRange(this.textarea, first, first);
                     }
                     break;
                 case 3:
