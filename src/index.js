@@ -1,4 +1,5 @@
 var Recode = require('./recode');
 
-window.Recode = Recode;
+module.exports = window.Recode = Recode;
+
 

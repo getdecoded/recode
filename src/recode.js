@@ -98,13 +98,14 @@ Recode.prototype.playrender = function() {
 };
 
 Recode.prototype.render = function() {
-    var self = this;
+    var self = this, updated = false;
 
     for(i = this.currentIndex + 1; i < this.recorddata.recorded.length; i ++) {
         var ev = this.recorddata.recorded[i],
             file = this.currentFile;
 
         if (this.currentTime - this.lastActionTime >= ev.distance) {
+            updated = true;
             this.lastActionTime += ev.distance;
             this.currentIndex += 1;
 
@@ -142,11 +143,13 @@ Recode.prototype.render = function() {
                     this.adapter.changeFile(ev.data, this.currentFile);
                     break;
             }
-
-            this.adapter.render();
         } else {
             break;
         }
+    }
+
+    if (updated) {
+        this.adapter.render();
     }
 
 };

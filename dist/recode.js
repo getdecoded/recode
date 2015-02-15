@@ -1,7 +1,8 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Recode = require('./recode');
 
-window.Recode = Recode;
+module.exports = window.Recode = Recode;
+
 
 
 },{"./recode":3}],2:[function(require,module,exports){
@@ -160,13 +161,14 @@ Recode.prototype.playrender = function() {
 };
 
 Recode.prototype.render = function() {
-    var self = this;
+    var self = this, updated = false;
 
     for(i = this.currentIndex + 1; i < this.recorddata.recorded.length; i ++) {
         var ev = this.recorddata.recorded[i],
             file = this.currentFile;
 
         if (this.currentTime - this.lastActionTime >= ev.distance) {
+            updated = true;
             this.lastActionTime += ev.distance;
             this.currentIndex += 1;
 
@@ -204,11 +206,13 @@ Recode.prototype.render = function() {
                     this.adapter.changeFile(ev.data, this.currentFile);
                     break;
             }
-
-            this.adapter.render();
         } else {
             break;
         }
+    }
+
+    if (updated) {
+        this.adapter.render();
     }
 
 };
