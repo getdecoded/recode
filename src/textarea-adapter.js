@@ -1,8 +1,6 @@
 var Recode = require('./recode');
 var Helper = Recode.Helper;
 
-console.log(Recode);
-
 var TextareaAdapter = function(recode) {
     this.recode = recode;
 

@@ -10,6 +10,14 @@ Helper.nthIndex = function(str, pat, n){
     return i;
 };
 
+Helper.nthIndexRegex = function(str, pat, n){
+    var L= str.length, i= -1, match;
+    while (((match = pat.exec(str)) != null) && (n--)) {
+        i = match.index;
+    }
+    return i;
+};
+
 Helper.coordsToIndex = function(text, row, col) {
     return Helper.nthIndex(text, '\n', row) + 1 + col;
 };

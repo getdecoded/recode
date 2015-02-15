@@ -135,7 +135,6 @@ Recode.prototype.render = function() {
                 case 3:
                     // Change file
                     this.files.forEach(function(file) {
-                        console.log(file.path, ev.data, file.path == ev.data);
                         if (file.path === ev.data) {
                             self.currentFile = file;
                         }
@@ -157,6 +156,7 @@ Recode.prototype.render = function() {
 Recode.prototype.play = function() {
     var self = this;
     this.playing = true;
+    this.lastTimestamp = (new Date()).getTime();
     this.requestid = requestAnimationFrame(function() {
         Recode.prototype.playrender.call(self);
     });
@@ -170,10 +170,11 @@ Recode.prototype.pause = function() {
 
 Recode.adapters = { };
 Recode.defaultOptions = {
-    adapter: 'textarea'
+    adapter: 'pre'
 };
 Recode.Helper = Helper;
 
 Recode.TextareaAdapter = require('./textarea-adapter');
+Recode.PreAdapter = require('./pre-adapter');
 
 

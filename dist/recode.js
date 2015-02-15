@@ -5,7 +5,7 @@ module.exports = window.Recode = Recode;
 
 
 
-},{"./recode":3}],2:[function(require,module,exports){
+},{"./recode":4}],2:[function(require,module,exports){
 var Helper = { };
 
 // Thanks kennebec
@@ -14,6 +14,14 @@ Helper.nthIndex = function(str, pat, n){
     var L= str.length, i= -1;
     while(n-- && i++<L){
         i= str.indexOf(pat, i);
+    }
+    return i;
+};
+
+Helper.nthIndexRegex = function(str, pat, n){
+    var L= str.length, i= -1, match;
+    while (((match = pat.exec(str)) != null) && (n--)) {
+        i = match.index;
     }
     return i;
 };
@@ -61,6 +69,61 @@ Helper.extend = function() {
 module.exports = Helper;
 
 },{}],3:[function(require,module,exports){
+var Recode = require('./recode');
+var Helper = Recode.Helper;
+
+var PreAdapter = function(recode) {
+    this.recode = recode;
+
+    this.element = document.createElement('pre');
+    this.element.className = 'recode-text';
+    this.element.innerHTML = recode.files[0].currentContent;
+    this.recode.element.appendChild(this.element);
+}
+
+PreAdapter.prototype.insertText = function(text, position) {
+    // Nothing to see here
+};
+
+PreAdapter.prototype.removeText = function(position, length) {
+    // Nothing to see here
+};
+
+PreAdapter.prototype.changeSelection = function(position, length) {
+    // Nothing to see here
+};
+
+PreAdapter.prototype.changeFile = function(filepath, file) {
+    // Nothing to see here
+};
+
+PreAdapter.prototype.render = function() {
+    var file = this.recode.currentFile;
+
+    var first = Helper.coordsToIndex(file.currentContent, file.selections[0].position.row, file.selections[0].position.col),
+        second = Helper.coordsToIndex(file.currentContent, file.selections[0].position.row + file.selections[0].length.row, file.selections[0].position.col + file.selections[0].length.col), beginning, end;
+
+    if (first <= second) {
+        beginning = first;
+        end = second;
+    } else {
+        beginning = second;
+        end = first;
+    }
+
+    var elemOpen = '<span class="recode-selection">';
+
+    if (beginning == end) {
+        elemOpen = '<span class="recode-caret">';
+    }
+
+    this.element.innerHTML = file.currentContent.slice(0, beginning) + elemOpen + file.currentContent.slice(beginning, end) + '</span>' + file.currentContent.slice(end);
+};
+
+Recode.adapters.pre = PreAdapter;
+module.exports = PreAdapter;
+
+},{"./recode":4}],4:[function(require,module,exports){
 var Helper = require('./helper');
 
 // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
@@ -198,7 +261,6 @@ Recode.prototype.render = function() {
                 case 3:
                     // Change file
                     this.files.forEach(function(file) {
-                        console.log(file.path, ev.data, file.path == ev.data);
                         if (file.path === ev.data) {
                             self.currentFile = file;
                         }
@@ -220,6 +282,7 @@ Recode.prototype.render = function() {
 Recode.prototype.play = function() {
     var self = this;
     this.playing = true;
+    this.lastTimestamp = (new Date()).getTime();
     this.requestid = requestAnimationFrame(function() {
         Recode.prototype.playrender.call(self);
     });
@@ -233,19 +296,18 @@ Recode.prototype.pause = function() {
 
 Recode.adapters = { };
 Recode.defaultOptions = {
-    adapter: 'textarea'
+    adapter: 'pre'
 };
 Recode.Helper = Helper;
 
 Recode.TextareaAdapter = require('./textarea-adapter');
+Recode.PreAdapter = require('./pre-adapter');
 
 
 
-},{"./helper":2,"./textarea-adapter":4}],4:[function(require,module,exports){
+},{"./helper":2,"./pre-adapter":3,"./textarea-adapter":5}],5:[function(require,module,exports){
 var Recode = require('./recode');
 var Helper = Recode.Helper;
-
-console.log(Recode);
 
 var TextareaAdapter = function(recode) {
     this.recode = recode;
@@ -295,4 +357,4 @@ TextareaAdapter.prototype.render = function() {
 Recode.adapters.textarea = TextareaAdapter;
 module.exports = TextareaAdapter;
 
-},{"./recode":3}]},{},[1]);
+},{"./recode":4}]},{},[1]);
