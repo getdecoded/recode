@@ -1,4 +1,3 @@
-var TextareaAdapter = require('./textarea-adapter');
 var Helper = require('./helper');
 
 // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
@@ -30,11 +29,21 @@ var Helper = require('./helper');
         };
 }());
 
-var Recode = function(element, recorddata) {
+var Recode = module.exports = function(options) {
+    if (!options.element) {
+        throw new Error('Must supply element in Recode options');
+    }
+
+    if (!options.recorddata) {
+        throw new Error('Must supply recorddata in Recode options');
+    }
+
+    options = this.options = Helper.extend({ }, Recode.defaultOptions, options);
+
     var self = this;
 
-    this.element = element;
-    this.recorddata = recorddata;
+    this.element = options.element;
+    this.recorddata = options.recorddata;
     this.files = [];
 
     this.playing = false;
@@ -67,7 +76,7 @@ var Recode = function(element, recorddata) {
     });
 
     this.currentFile = this.files[0];
-    this.adapter = new TextareaAdapter(this);
+    this.adapter = new Recode.adapters[this.options.adapter](this);
 };
 
 Recode.prototype.playrender = function() {
@@ -80,8 +89,6 @@ Recode.prototype.playrender = function() {
     this.currentTime += difference * 10;
 
     this.render();
-
-
 
     if (this.playing) {
         this.requestid = requestAnimationFrame(function() {
@@ -158,4 +165,12 @@ Recode.prototype.pause = function() {
     this.requestid = null;
 };
 
-module.exports = Recode;
+Recode.adapters = { };
+Recode.defaultOptions = {
+    adapter: 'textarea'
+};
+Recode.Helper = Helper;
+
+Recode.TextareaAdapter = require('./textarea-adapter');
+
+

@@ -44,10 +44,22 @@ Helper.setSelectionRange = function(input, selectionStart, selectionEnd) {
     }
 };
 
+// Thanks Ryan Lynch
+// http://stackoverflow.com/a/11197343/1136593
+Helper.extend = function() {
+    for(var i=1; i<arguments.length; i++) {
+        for(var key in arguments[i]) {
+            if (arguments[i].hasOwnProperty(key)) {
+                arguments[0][key] = arguments[i][key];
+            }
+        }
+    }
+    return arguments[0];
+}
+
 module.exports = Helper;
 
 },{}],3:[function(require,module,exports){
-var TextareaAdapter = require('./textarea-adapter');
 var Helper = require('./helper');
 
 // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
@@ -79,11 +91,21 @@ var Helper = require('./helper');
         };
 }());
 
-var Recode = function(element, recorddata) {
+var Recode = module.exports = function(options) {
+    if (!options.element) {
+        throw new Error('Must supply element in Recode options');
+    }
+
+    if (!options.recorddata) {
+        throw new Error('Must supply recorddata in Recode options');
+    }
+
+    options = this.options = Helper.extend({ }, Recode.defaultOptions, options);
+
     var self = this;
 
-    this.element = element;
-    this.recorddata = recorddata;
+    this.element = options.element;
+    this.recorddata = options.recorddata;
     this.files = [];
 
     this.playing = false;
@@ -116,7 +138,7 @@ var Recode = function(element, recorddata) {
     });
 
     this.currentFile = this.files[0];
-    this.adapter = new TextareaAdapter(this);
+    this.adapter = new Recode.adapters[this.options.adapter](this);
 };
 
 Recode.prototype.playrender = function() {
@@ -129,8 +151,6 @@ Recode.prototype.playrender = function() {
     this.currentTime += difference * 10;
 
     this.render();
-
-
 
     if (this.playing) {
         this.requestid = requestAnimationFrame(function() {
@@ -207,9 +227,22 @@ Recode.prototype.pause = function() {
     this.requestid = null;
 };
 
-module.exports = Recode;
+Recode.adapters = { };
+Recode.defaultOptions = {
+    adapter: 'textarea'
+};
+Recode.Helper = Helper;
+
+Recode.TextareaAdapter = require('./textarea-adapter');
+
+
 
 },{"./helper":2,"./textarea-adapter":4}],4:[function(require,module,exports){
+var Recode = require('./recode');
+var Helper = Recode.Helper;
+
+console.log(Recode);
+
 var TextareaAdapter = function(recode) {
     this.recode = recode;
 
@@ -240,59 +273,22 @@ TextareaAdapter.prototype.render = function() {
 
     this.element.innerHTML = file.currentContent;
 
-    var first = coordsToIndex(file.currentContent, file.selections[0].position.row, file.selections[0].position.col),
-        second = coordsToIndex(file.currentContent, file.selections[0].position.row + file.selections[0].length.row, file.selections[0].position.col + file.selections[0].length.col);
+    var first = Helper.coordsToIndex(file.currentContent, file.selections[0].position.row, file.selections[0].position.col),
+        second = Helper.coordsToIndex(file.currentContent, file.selections[0].position.row + file.selections[0].length.row, file.selections[0].position.col + file.selections[0].length.col);
 
     if (first < second) {
-        setSelectionRange(this.element, first, second);
+        Helper.setSelectionRange(this.element, first, second);
     } else if (first > second) {
-        setSelectionRange(this.element, second, first);
+        Helper.setSelectionRange(this.element, second, first);
     } else {
         // Disabled textareas don't like this
         // But the implementation is buggy anyway
         // So this is here as a reminder
-        setSelectionRange(this.element, first, first);
+        Helper.setSelectionRange(this.element, first, first);
     }
 };
 
-
-// Thanks kennebec
-// http://stackoverflow.com/a/14482123/1136593
-function nthIndex(str, pat, n){
-    var L= str.length, i= -1;
-    while(n-- && i++<L){
-        i= str.indexOf(pat, i);
-    }
-    return i;
-}
-
-function coordsToIndex(text, row, col) {
-    return nthIndex(text, '\n', row) + 1 + col;
-}
-
-function insertString(text, sub, position) {
-    return [text.slice(0, position), sub, text.slice(position)].join('');
-}
-
-function removeString(text, pos1, pos2) {
-    return text.slice(0, pos1) + text.slice(pos2);
-}
-
-// Thanks CMS
-// http://stackoverflow.com/a/499158/1136593
-function setSelectionRange(input, selectionStart, selectionEnd) {
-    if (input.setSelectionRange) {
-        input.focus();
-        input.setSelectionRange(selectionStart, selectionEnd);
-    } else if (input.createTextRange) {
-        var range = input.createTextRange();
-        range.collapse(true);
-        range.moveEnd('character', selectionEnd);
-        range.moveStart('character', selectionStart);
-        range.select();
-    }
-}
-
+Recode.adapters.textarea = TextareaAdapter;
 module.exports = TextareaAdapter;
 
-},{}]},{},[1]);
+},{"./recode":3}]},{},[1]);

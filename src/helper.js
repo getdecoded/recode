@@ -37,4 +37,17 @@ Helper.setSelectionRange = function(input, selectionStart, selectionEnd) {
     }
 };
 
+// Thanks Ryan Lynch
+// http://stackoverflow.com/a/11197343/1136593
+Helper.extend = function() {
+    for(var i=1; i<arguments.length; i++) {
+        for(var key in arguments[i]) {
+            if (arguments[i].hasOwnProperty(key)) {
+                arguments[0][key] = arguments[i][key];
+            }
+        }
+    }
+    return arguments[0];
+}
+
 module.exports = Helper;

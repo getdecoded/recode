@@ -38,6 +38,6 @@
         </div>
         <script src="recorddata.js"></script>
         <script src="../dist/recode.js"></script>
-        <script>var recode = new Recode(document.querySelector('.recode'), recorddata); recode.play();</script>
+        <script>var recode = new Recode({element: document.querySelector('.recode'), recorddata: recorddata}); recode.play();</script>
     </body>
 </html>
