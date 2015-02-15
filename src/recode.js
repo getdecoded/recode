@@ -1,4 +1,5 @@
 var TextareaAdapter = require('./textarea-adapter');
+var Helper = require('./helper');
 
 // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
 
@@ -48,7 +49,7 @@ var Recode = function(element, recorddata) {
     var codeTags = this.element.getElementsByTagName('code'), removearray = [];
 
     Array.prototype.forEach.call(codeTags, function(obj, num) {
-        var filepath = obj.getAttribute('data-filepath'), fileobj = { };
+        var filepath = obj.getAttribute('data-filepath'), fileobj = { selections: [ { position: { row: 0, col: 0 }, length: { row: 0, col: 0 } } ] };
         if (!filepath) {
             throw new Error('<code> tag must have a data-filepath attribute');
         }
@@ -102,13 +103,25 @@ Recode.prototype.render = function() {
 
             switch (ev.mode) {
                 case 0:
+                    file.currentContent = Helper.insertString(file.currentContent, ev.data, Helper.coordsToIndex(file.currentContent, ev.position.row, ev.position.col));
                     this.adapter.insertText(ev.data, ev.position);
                     break;
                 case 1:
+                    file.currentContent = Helper.removeString(file.currentContent, Helper.coordsToIndex(file.currentContent, ev.position.row, ev.position.col), Helper.coordsToIndex(file.currentContent, ev.position.row + ev.length.row, ev.position.col + ev.length.col));
                     this.adapter.removeText(ev.position, ev.length);
                     break;
                 case 2:
                     // Change selection
+                    this.currentFile.selections[0] = {
+                        position: {
+                            row: ev.position.row,
+                            col: ev.position.col
+                        }, length: {
+                            row: ev.length.row,
+                            col: ev.length.col
+                        }
+                    };
+
                     this.adapter.changeSelection(ev.position, ev.length);
                     break;
                 case 3:
@@ -122,6 +135,8 @@ Recode.prototype.render = function() {
                     this.adapter.changeFile(ev.data, this.currentFile);
                     break;
             }
+
+            this.adapter.render();
         } else {
             break;
         }

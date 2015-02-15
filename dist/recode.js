@@ -4,8 +4,51 @@ var Recode = require('./recode');
 window.Recode = Recode;
 
 
-},{"./recode":2}],2:[function(require,module,exports){
+},{"./recode":3}],2:[function(require,module,exports){
+var Helper = { };
+
+// Thanks kennebec
+// http://stackoverflow.com/a/14482123/1136593
+Helper.nthIndex = function(str, pat, n){
+    var L= str.length, i= -1;
+    while(n-- && i++<L){
+        i= str.indexOf(pat, i);
+    }
+    return i;
+};
+
+Helper.coordsToIndex = function(text, row, col) {
+    return Helper.nthIndex(text, '\n', row) + 1 + col;
+};
+
+Helper.insertString = function(text, sub, position) {
+    return [text.slice(0, position), sub, text.slice(position)].join('');
+};
+
+Helper.removeString = function(text, pos1, pos2) {
+    return text.slice(0, pos1) + text.slice(pos2);
+};
+
+// Thanks CMS
+// http://stackoverflow.com/a/499158/1136593
+Helper.setSelectionRange = function(input, selectionStart, selectionEnd) {
+    if (input.setSelectionRange) {
+        input.focus();
+        input.setSelectionRange(selectionStart, selectionEnd);
+    } else if (input.createTextRange) {
+        var range = input.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', selectionEnd);
+        range.moveStart('character', selectionStart);
+        range.select();
+    }
+};
+
+module.exports = Helper;
+
+},{}],3:[function(require,module,exports){
 var TextareaAdapter = require('./textarea-adapter');
+var Helper = require('./helper');
 
 // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
 
@@ -55,7 +98,7 @@ var Recode = function(element, recorddata) {
     var codeTags = this.element.getElementsByTagName('code'), removearray = [];
 
     Array.prototype.forEach.call(codeTags, function(obj, num) {
-        var filepath = obj.getAttribute('data-filepath'), fileobj = { };
+        var filepath = obj.getAttribute('data-filepath'), fileobj = { selections: [ { position: { row: 0, col: 0 }, length: { row: 0, col: 0 } } ] };
         if (!filepath) {
             throw new Error('<code> tag must have a data-filepath attribute');
         }
@@ -109,13 +152,25 @@ Recode.prototype.render = function() {
 
             switch (ev.mode) {
                 case 0:
+                    file.currentContent = Helper.insertString(file.currentContent, ev.data, Helper.coordsToIndex(file.currentContent, ev.position.row, ev.position.col));
                     this.adapter.insertText(ev.data, ev.position);
                     break;
                 case 1:
+                    file.currentContent = Helper.removeString(file.currentContent, Helper.coordsToIndex(file.currentContent, ev.position.row, ev.position.col), Helper.coordsToIndex(file.currentContent, ev.position.row + ev.length.row, ev.position.col + ev.length.col));
                     this.adapter.removeText(ev.position, ev.length);
                     break;
                 case 2:
                     // Change selection
+                    this.currentFile.selections[0] = {
+                        position: {
+                            row: ev.position.row,
+                            col: ev.position.col
+                        }, length: {
+                            row: ev.length.row,
+                            col: ev.length.col
+                        }
+                    };
+
                     this.adapter.changeSelection(ev.position, ev.length);
                     break;
                 case 3:
@@ -129,6 +184,8 @@ Recode.prototype.render = function() {
                     this.adapter.changeFile(ev.data, this.currentFile);
                     break;
             }
+
+            this.adapter.render();
         } else {
             break;
         }
@@ -152,7 +209,7 @@ Recode.prototype.pause = function() {
 
 module.exports = Recode;
 
-},{"./textarea-adapter":3}],3:[function(require,module,exports){
+},{"./helper":2,"./textarea-adapter":4}],4:[function(require,module,exports){
 var TextareaAdapter = function(recode) {
     this.recode = recode;
 
@@ -163,22 +220,28 @@ var TextareaAdapter = function(recode) {
 }
 
 TextareaAdapter.prototype.insertText = function(text, position) {
-    var file = this.recode.currentFile;
-
-    file.currentContent = insertString(file.currentContent, text, coordsToIndex(file.currentContent, position.row, position.col));
-    this.element.innerHTML = file.currentContent;
+    // Nothing to see here
 };
 
 TextareaAdapter.prototype.removeText = function(position, length) {
-    var file = this.recode.currentFile;
-
-    file.currentContent = removeString(file.currentContent, coordsToIndex(file.currentContent, position.row, position.col), coordsToIndex(file.currentContent, position.row + length.row, position.col + length.col));
-    this.element.innerHTML = file.currentContent;
+    // Nothing to see here
 };
 
 TextareaAdapter.prototype.changeSelection = function(position, length) {
-    var first = coordsToIndex(this.recode.currentFile.currentContent, position.row, position.col),
-        second = coordsToIndex(this.recode.currentFile.currentContent, position.row + length.row, position.col + length.col);
+    // Nothing to see here
+};
+
+TextareaAdapter.prototype.changeFile = function(filepath, file) {
+    // Nothing to see here
+};
+
+TextareaAdapter.prototype.render = function() {
+    var file = this.recode.currentFile;
+
+    this.element.innerHTML = file.currentContent;
+
+    var first = coordsToIndex(file.currentContent, file.selections[0].position.row, file.selections[0].position.col),
+        second = coordsToIndex(file.currentContent, file.selections[0].position.row + file.selections[0].length.row, file.selections[0].position.col + file.selections[0].length.col);
 
     if (first < second) {
         setSelectionRange(this.element, first, second);
@@ -190,10 +253,6 @@ TextareaAdapter.prototype.changeSelection = function(position, length) {
         // So this is here as a reminder
         setSelectionRange(this.element, first, first);
     }
-};
-
-TextareaAdapter.prototype.changeFile = function(filepath, file) {
-    this.element.innerHTML = file.currentContent;
 };
 
 

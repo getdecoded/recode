@@ -8,22 +8,28 @@ var TextareaAdapter = function(recode) {
 }
 
 TextareaAdapter.prototype.insertText = function(text, position) {
-    var file = this.recode.currentFile;
-
-    file.currentContent = insertString(file.currentContent, text, coordsToIndex(file.currentContent, position.row, position.col));
-    this.element.innerHTML = file.currentContent;
+    // Nothing to see here
 };
 
 TextareaAdapter.prototype.removeText = function(position, length) {
-    var file = this.recode.currentFile;
-
-    file.currentContent = removeString(file.currentContent, coordsToIndex(file.currentContent, position.row, position.col), coordsToIndex(file.currentContent, position.row + length.row, position.col + length.col));
-    this.element.innerHTML = file.currentContent;
+    // Nothing to see here
 };
 
 TextareaAdapter.prototype.changeSelection = function(position, length) {
-    var first = coordsToIndex(this.recode.currentFile.currentContent, position.row, position.col),
-        second = coordsToIndex(this.recode.currentFile.currentContent, position.row + length.row, position.col + length.col);
+    // Nothing to see here
+};
+
+TextareaAdapter.prototype.changeFile = function(filepath, file) {
+    // Nothing to see here
+};
+
+TextareaAdapter.prototype.render = function() {
+    var file = this.recode.currentFile;
+
+    this.element.innerHTML = file.currentContent;
+
+    var first = coordsToIndex(file.currentContent, file.selections[0].position.row, file.selections[0].position.col),
+        second = coordsToIndex(file.currentContent, file.selections[0].position.row + file.selections[0].length.row, file.selections[0].position.col + file.selections[0].length.col);
 
     if (first < second) {
         setSelectionRange(this.element, first, second);
@@ -35,10 +41,6 @@ TextareaAdapter.prototype.changeSelection = function(position, length) {
         // So this is here as a reminder
         setSelectionRange(this.element, first, first);
     }
-};
-
-TextareaAdapter.prototype.changeFile = function(filepath, file) {
-    this.element.innerHTML = file.currentContent;
 };
 
 
