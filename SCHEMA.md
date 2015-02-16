@@ -31,19 +31,19 @@ The `recorded` property is an array of actions to take on one or more text files
 
 ### `mode == 0`
 
-The text contained in `data` should be inserted at `postition`.
+The range of text covered by `position` and `length` is to be replaced by the text in `data`. 
 
 ### `mode == 1`
 
-The range of text covered by `position` and `length` is to be deleted.
+The range of text covered by `position` and `length` is to be selected. If length is 0 in magnitude, the caret is to be moved to `position`. `length` may represent an end of the selection that is before the beginning.
 
 ### `mode == 2`
 
-The range of text covered by `position` and `length` is to be selected. If length is 0 in magnitude, the caret is to be moved to `position`.
-
-### `mode == 3`
-
 The file is to be switched to the file indicated in `data` (where `file.path == recorded.data`).
+
+## No newline horror
+
+Text should be represented by either a single string representing a single line, or an array of strings representing lines one after the other. A particular playback mechanism may support newline characters, if it wants but there is no official support for this.
 
 ## Todo
 
