@@ -200,5 +200,6 @@ Recode.Helper = Helper;
 
 Recode.TextareaAdapter = require('./textarea-adapter');
 Recode.PreAdapter = require('./pre-adapter');
+Recode.CodeMirrorAdapter = require('./codemirror-adapter');
 
 
