@@ -23,7 +23,6 @@ Helper.coordsToIndex = function(text, row, col) {
     var firstIndex = Helper.nthIndex(text, '\n', row);
     var secondIndex = Helper.nthIndex(text, '\n', row + 1);
     var lineLength = (secondIndex >= 0 ? secondIndex : text.length) - (firstIndex >= 0 ? firstIndex : 0);
-    console.log(lineLength);
     return (firstIndex >= 0 ? firstIndex + 1 : 0) + Math.min(col, lineLength);
 };
 
