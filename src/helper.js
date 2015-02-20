@@ -74,6 +74,16 @@ Helper.extend = function() {
         }
     }
     return arguments[0];
-}
+};
+
+Helper.simplifyLanguageMappings = function(map) {
+    var newmap = { };
+    map.forEach(function(ob) {
+        ob.names.forEach(function(name) {
+            newmap[name] = ob.mode;
+        });
+    });
+    return newmap;
+};
 
 module.exports = Helper;

@@ -78,7 +78,7 @@ var Recode = module.exports = function(options) {
     this.lastActionTime = 0;
     this.lastTime = 0;
     this.lastTimestamp = (new Date()).getTime();
-    this.currentIndex = 0;
+    this.currentIndex = -1;
 
     var codeTags = this.element.getElementsByTagName('code');
     var removearray = [];

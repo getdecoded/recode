@@ -4,8 +4,10 @@ var Helper = Recode.Helper;
 var CodeMirrorAdapter = function(recode) {
     this.recode = recode;
 
+    this.languageMap = Helper.simplifyLanguageMappings(CodeMirrorAdapter.languageMappings);
     this.codemirror = CodeMirror(this.recode.element);
     this.document = this.codemirror.getDoc();
+    this.mode = '';
     this.document.setValue(recode.files[0].currentContent);
 }
 
@@ -18,7 +20,12 @@ CodeMirrorAdapter.prototype.changeSelection = function(position, length) {
 };
 
 CodeMirrorAdapter.prototype.changeFile = function(filepath, file) {
-    // Nothing to see here
+    var mode = file.language || (typeof filepath === 'string') ? filepath.substring(filepath.lastIndexOf(".")+1) : '';
+
+    if (mode != '') {
+        this.mode = this.languageMap[mode] || mode;
+        this.codemirror.setOption('mode', this.mode);
+    }
 };
 
 CodeMirrorAdapter.prototype.render = function() {
@@ -42,7 +49,11 @@ CodeMirrorAdapter.prototype.render = function() {
 CodeMirrorAdapter.languageMappings = [
     {
         names: ['html', 'htm'],
-        mode: 'html-mixed'
+        mode: 'htmlmixed'
+    },
+    {
+        names: ['js'],
+        mode: 'javascript'
     }
 ];
 

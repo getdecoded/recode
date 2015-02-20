@@ -12,8 +12,10 @@ var Helper = Recode.Helper;
 var CodeMirrorAdapter = function(recode) {
     this.recode = recode;
 
+    this.languageMap = Helper.simplifyLanguageMappings(CodeMirrorAdapter.languageMappings);
     this.codemirror = CodeMirror(this.recode.element);
     this.document = this.codemirror.getDoc();
+    this.mode = '';
     this.document.setValue(recode.files[0].currentContent);
 }
 
@@ -26,7 +28,12 @@ CodeMirrorAdapter.prototype.changeSelection = function(position, length) {
 };
 
 CodeMirrorAdapter.prototype.changeFile = function(filepath, file) {
-    // Nothing to see here
+    var mode = file.language || (typeof filepath === 'string') ? filepath.substring(filepath.lastIndexOf(".")+1) : '';
+
+    if (mode != '') {
+        this.mode = this.languageMap[mode] || mode;
+        this.codemirror.setOption('mode', this.mode);
+    }
 };
 
 CodeMirrorAdapter.prototype.render = function() {
@@ -50,7 +57,11 @@ CodeMirrorAdapter.prototype.render = function() {
 CodeMirrorAdapter.languageMappings = [
     {
         names: ['html', 'htm'],
-        mode: 'html-mixed'
+        mode: 'htmlmixed'
+    },
+    {
+        names: ['js'],
+        mode: 'javascript'
     }
 ];
 
@@ -134,7 +145,17 @@ Helper.extend = function() {
         }
     }
     return arguments[0];
-}
+};
+
+Helper.simplifyLanguageMappings = function(map) {
+    var newmap = { };
+    map.forEach(function(ob) {
+        ob.names.forEach(function(name) {
+            newmap[name] = ob.mode;
+        });
+    });
+    return newmap;
+};
 
 module.exports = Helper;
 
@@ -272,7 +293,7 @@ var Recode = module.exports = function(options) {
     this.lastActionTime = 0;
     this.lastTime = 0;
     this.lastTimestamp = (new Date()).getTime();
-    this.currentIndex = 0;
+    this.currentIndex = -1;
 
     var codeTags = this.element.getElementsByTagName('code');
     var removearray = [];
