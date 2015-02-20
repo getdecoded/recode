@@ -21,13 +21,18 @@ This currently takes the form of a json file:
       "length": {"row": "Number", "col": "Number"},
       "distance": "Number"
     }
-  ]
+  ],
+  "varMap": {
+    "key": "String"
+  }
 }
 ```
 
 The top level of the JSON data can be used for any metadata, but reserved keywords haven't been firmly decided upon.
 
 The `recorded` property is an array of actions to take on one or more text files, assuming they are starting at a given state. The `mode` property dictates the action that should be taken. `data` is a property containing any useful data for that particular action (text to be inserted, files to be switched to). `position` is where in the text file that action should be taken, `length` is used as a relative coordinate for any length based actions (selections) and `distance` is the amount of milliseconds to wait from the previous action to perform this action.
+
+Every `key` stored in the `varMap` object maps to another key in a recorded action, with the value of this key being a new name to replace it with. This allows us to cut down on file size by mapping longer names to single letter strings.
 
 ### `mode == 0`
 

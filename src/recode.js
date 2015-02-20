@@ -46,6 +46,31 @@ var Recode = module.exports = function(options) {
     this.recorddata = options.recorddata;
     this.files = [];
 
+    if (this.recorddata.varMap) {
+        var newRecord = [];
+        var invertedKeys = {};
+
+        for (var i in this.recorddata.varMap) {
+            invertedKeys[this.recorddata.varMap[i]] = i;
+        }
+
+        this.recorddata.recorded.forEach(function(ob, i) {
+            var newOb = {};
+            for (var i in ob) {
+                if (typeof invertedKeys[i] != 'undefined') {
+                    newOb[invertedKeys[i]] = ob[i];
+                } else {
+                    newOb[i] = ob[i];
+                }
+            }
+
+            newRecord.push(newOb);
+        });
+
+        this.recorddata.recorded = newRecord;
+    }
+
+
     this.playing = false;
     this.requestid = null;
 
