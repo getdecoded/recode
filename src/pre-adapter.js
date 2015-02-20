@@ -10,11 +10,7 @@ var PreAdapter = function(recode) {
     this.recode.element.appendChild(this.element);
 }
 
-PreAdapter.prototype.insertText = function(text, position) {
-    // Nothing to see here
-};
-
-PreAdapter.prototype.removeText = function(position, length) {
+PreAdapter.prototype.changeText = function(text, position, length) {
     // Nothing to see here
 };
 
@@ -46,7 +42,9 @@ PreAdapter.prototype.render = function() {
         elemOpen = '<span class="recode-caret">';
     }
 
-    this.element.innerHTML = file.currentContent.slice(0, beginning) + elemOpen + file.currentContent.slice(beginning, end) + '</span>' + file.currentContent.slice(end);
+    this.element.innerHTML = Helper.escapeHtml(file.currentContent.slice(0, beginning)) + elemOpen
+        + Helper.escapeHtml(file.currentContent.slice(beginning, end)) + '</span>'
+        + Helper.escapeHtml(file.currentContent.slice(end));
 };
 
 Recode.adapters.pre = PreAdapter;

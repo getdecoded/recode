@@ -10,11 +10,7 @@ var TextareaAdapter = function(recode) {
     this.recode.element.appendChild(this.element);
 }
 
-TextareaAdapter.prototype.insertText = function(text, position) {
-    // Nothing to see here
-};
-
-TextareaAdapter.prototype.removeText = function(position, length) {
+TextareaAdapter.prototype.changeText = function(text, position, length) {
     // Nothing to see here
 };
 

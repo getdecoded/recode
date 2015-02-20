@@ -18,6 +18,7 @@ Helper.nthIndex = function(str, pat, n){
     return i;
 };
 
+// Returns the
 Helper.nthIndexRegex = function(str, pat, n){
     var L= str.length, i= -1, match;
     while (((match = pat.exec(str)) != null) && (n--)) {
@@ -27,7 +28,11 @@ Helper.nthIndexRegex = function(str, pat, n){
 };
 
 Helper.coordsToIndex = function(text, row, col) {
-    return Helper.nthIndex(text, '\n', row) + 1 + col;
+    var firstIndex = Helper.nthIndex(text, '\n', row);
+    var secondIndex = Helper.nthIndex(text, '\n', row + 1);
+    var lineLength = (secondIndex >= 0 ? secondIndex : text.length) - (firstIndex >= 0 ? firstIndex : 0);
+    console.log(lineLength);
+    return (firstIndex >= 0 ? firstIndex + 1 : 0) + Math.min(col, lineLength);
 };
 
 Helper.insertString = function(text, sub, position) {
@@ -37,6 +42,20 @@ Helper.insertString = function(text, sub, position) {
 Helper.removeString = function(text, pos1, pos2) {
     return text.slice(0, pos1) + text.slice(pos2);
 };
+
+// Thanks Kip
+// http://stackoverflow.com/a/4835406/1136593
+Helper.escapeHtml = function(text) {
+    var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
 
 // Thanks CMS
 // http://stackoverflow.com/a/499158/1136593
@@ -81,11 +100,7 @@ var PreAdapter = function(recode) {
     this.recode.element.appendChild(this.element);
 }
 
-PreAdapter.prototype.insertText = function(text, position) {
-    // Nothing to see here
-};
-
-PreAdapter.prototype.removeText = function(position, length) {
+PreAdapter.prototype.changeText = function(text, position, length) {
     // Nothing to see here
 };
 
@@ -117,7 +132,9 @@ PreAdapter.prototype.render = function() {
         elemOpen = '<span class="recode-caret">';
     }
 
-    this.element.innerHTML = file.currentContent.slice(0, beginning) + elemOpen + file.currentContent.slice(beginning, end) + '</span>' + file.currentContent.slice(end);
+    this.element.innerHTML = Helper.escapeHtml(file.currentContent.slice(0, beginning)) + elemOpen
+        + Helper.escapeHtml(file.currentContent.slice(beginning, end)) + '</span>'
+        + Helper.escapeHtml(file.currentContent.slice(end));
 };
 
 Recode.adapters.pre = PreAdapter;
@@ -181,7 +198,9 @@ var Recode = module.exports = function(options) {
     this.lastTimestamp = (new Date()).getTime();
     this.currentIndex = 0;
 
-    var codeTags = this.element.getElementsByTagName('code'), removearray = [];
+    var codeTags = this.element.getElementsByTagName('code');
+    var removearray = [];
+    var newline = /\r\n|\n\r|\n|\r/g;
 
     Array.prototype.forEach.call(codeTags, function(obj, num) {
         var filepath = obj.getAttribute('data-filepath'), fileobj = { selections: [ { position: { row: 0, col: 0 }, length: { row: 0, col: 0 } } ] };
@@ -190,8 +209,8 @@ var Recode = module.exports = function(options) {
         }
 
         fileobj.path = filepath;
-        fileobj.initialcontent = obj.innerHTML;
-        fileobj.currentContent = obj.innerHTML;
+        fileobj.initialcontent = obj.innerHTML.replace(newline, '\n');
+        fileobj.currentContent = fileobj.initialcontent;
 
         self.files.push(fileobj);
         removearray.push(obj);
@@ -212,7 +231,7 @@ Recode.prototype.playrender = function() {
 
     this.lastTimestamp = now;
     this.lastTime = this.currentTime;
-    this.currentTime += difference * 10;
+    this.currentTime += difference;
 
     this.render();
 
@@ -237,14 +256,11 @@ Recode.prototype.render = function() {
 
             switch (ev.mode) {
                 case 0:
-                    file.currentContent = Helper.insertString(file.currentContent, ev.data, Helper.coordsToIndex(file.currentContent, ev.position.row, ev.position.col));
-                    this.adapter.insertText(ev.data, ev.position);
+                    var removed = Helper.removeString(file.currentContent, Helper.coordsToIndex(file.currentContent, ev.position.row, ev.position.col), Helper.coordsToIndex(file.currentContent, ev.position.row + ev.length.row, ev.position.col + ev.length.col));
+                    file.currentContent = Helper.insertString(removed, ev.data.join('\n'), Helper.coordsToIndex(removed, ev.position.row, ev.position.col));
+                    this.adapter.changeText(ev.data, ev.position, ev.length);
                     break;
                 case 1:
-                    file.currentContent = Helper.removeString(file.currentContent, Helper.coordsToIndex(file.currentContent, ev.position.row, ev.position.col), Helper.coordsToIndex(file.currentContent, ev.position.row + ev.length.row, ev.position.col + ev.length.col));
-                    this.adapter.removeText(ev.position, ev.length);
-                    break;
-                case 2:
                     // Change selection
                     this.currentFile.selections[0] = {
                         position: {
@@ -258,7 +274,7 @@ Recode.prototype.render = function() {
 
                     this.adapter.changeSelection(ev.position, ev.length);
                     break;
-                case 3:
+                case 2:
                     // Change file
                     this.files.forEach(function(file) {
                         if (file.path === ev.data) {
@@ -318,11 +334,7 @@ var TextareaAdapter = function(recode) {
     this.recode.element.appendChild(this.element);
 }
 
-TextareaAdapter.prototype.insertText = function(text, position) {
-    // Nothing to see here
-};
-
-TextareaAdapter.prototype.removeText = function(position, length) {
+TextareaAdapter.prototype.changeText = function(text, position, length) {
     // Nothing to see here
 };
 

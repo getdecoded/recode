@@ -10,6 +10,7 @@ Helper.nthIndex = function(str, pat, n){
     return i;
 };
 
+// Returns the
 Helper.nthIndexRegex = function(str, pat, n){
     var L= str.length, i= -1, match;
     while (((match = pat.exec(str)) != null) && (n--)) {
@@ -19,7 +20,11 @@ Helper.nthIndexRegex = function(str, pat, n){
 };
 
 Helper.coordsToIndex = function(text, row, col) {
-    return Helper.nthIndex(text, '\n', row) + 1 + col;
+    var firstIndex = Helper.nthIndex(text, '\n', row);
+    var secondIndex = Helper.nthIndex(text, '\n', row + 1);
+    var lineLength = (secondIndex >= 0 ? secondIndex : text.length) - (firstIndex >= 0 ? firstIndex : 0);
+    console.log(lineLength);
+    return (firstIndex >= 0 ? firstIndex + 1 : 0) + Math.min(col, lineLength);
 };
 
 Helper.insertString = function(text, sub, position) {
@@ -29,6 +34,20 @@ Helper.insertString = function(text, sub, position) {
 Helper.removeString = function(text, pos1, pos2) {
     return text.slice(0, pos1) + text.slice(pos2);
 };
+
+// Thanks Kip
+// http://stackoverflow.com/a/4835406/1136593
+Helper.escapeHtml = function(text) {
+    var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
 
 // Thanks CMS
 // http://stackoverflow.com/a/499158/1136593

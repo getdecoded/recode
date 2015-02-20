@@ -55,7 +55,9 @@ var Recode = module.exports = function(options) {
     this.lastTimestamp = (new Date()).getTime();
     this.currentIndex = 0;
 
-    var codeTags = this.element.getElementsByTagName('code'), removearray = [];
+    var codeTags = this.element.getElementsByTagName('code');
+    var removearray = [];
+    var newline = /\r\n|\n\r|\n|\r/g;
 
     Array.prototype.forEach.call(codeTags, function(obj, num) {
         var filepath = obj.getAttribute('data-filepath'), fileobj = { selections: [ { position: { row: 0, col: 0 }, length: { row: 0, col: 0 } } ] };
@@ -64,8 +66,8 @@ var Recode = module.exports = function(options) {
         }
 
         fileobj.path = filepath;
-        fileobj.initialcontent = obj.innerHTML;
-        fileobj.currentContent = obj.innerHTML;
+        fileobj.initialcontent = obj.innerHTML.replace(newline, '\n');
+        fileobj.currentContent = fileobj.initialcontent;
 
         self.files.push(fileobj);
         removearray.push(obj);
@@ -86,7 +88,7 @@ Recode.prototype.playrender = function() {
 
     this.lastTimestamp = now;
     this.lastTime = this.currentTime;
-    this.currentTime += difference * 10;
+    this.currentTime += difference;
 
     this.render();
 
@@ -111,14 +113,11 @@ Recode.prototype.render = function() {
 
             switch (ev.mode) {
                 case 0:
-                    file.currentContent = Helper.insertString(file.currentContent, ev.data, Helper.coordsToIndex(file.currentContent, ev.position.row, ev.position.col));
-                    this.adapter.insertText(ev.data, ev.position);
+                    var removed = Helper.removeString(file.currentContent, Helper.coordsToIndex(file.currentContent, ev.position.row, ev.position.col), Helper.coordsToIndex(file.currentContent, ev.position.row + ev.length.row, ev.position.col + ev.length.col));
+                    file.currentContent = Helper.insertString(removed, ev.data.join('\n'), Helper.coordsToIndex(removed, ev.position.row, ev.position.col));
+                    this.adapter.changeText(ev.data, ev.position, ev.length);
                     break;
                 case 1:
-                    file.currentContent = Helper.removeString(file.currentContent, Helper.coordsToIndex(file.currentContent, ev.position.row, ev.position.col), Helper.coordsToIndex(file.currentContent, ev.position.row + ev.length.row, ev.position.col + ev.length.col));
-                    this.adapter.removeText(ev.position, ev.length);
-                    break;
-                case 2:
                     // Change selection
                     this.currentFile.selections[0] = {
                         position: {
@@ -132,7 +131,7 @@ Recode.prototype.render = function() {
 
                     this.adapter.changeSelection(ev.position, ev.length);
                     break;
-                case 3:
+                case 2:
                     // Change file
                     this.files.forEach(function(file) {
                         if (file.path === ev.data) {
