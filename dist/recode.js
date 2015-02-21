@@ -5,7 +5,45 @@ module.exports = window.Recode = Recode;
 
 
 
-},{"./recode":5}],2:[function(require,module,exports){
+},{"./recode":6}],2:[function(require,module,exports){
+var Recode = require('./recode');
+var Helper = Recode.Helper;
+
+var AceAdapter = function(recode) {
+    this.recode = recode;
+}
+
+AceAdapter.prototype.changeText = function(text, position, length) {
+    // Nothing to see here
+};
+
+AceAdapter.prototype.changeSelection = function(position, length) {
+    // Nothing to see here
+};
+
+AceAdapter.prototype.changeFile = function(filepath, file) {
+    // Change language
+};
+
+AceAdapter.prototype.render = function() {
+    // Render it
+};
+
+/*AceAdapter.languageMappings = [
+    {
+        names: ['html', 'htm'],
+        mode: 'htmlmixed'
+    },
+    {
+        names: ['js'],
+        mode: 'javascript'
+    }
+];*/
+
+Recode.adapters.ace = AceAdapter;
+module.exports = AceAdapter;
+
+},{"./recode":6}],3:[function(require,module,exports){
 var Recode = require('./recode');
 var Helper = Recode.Helper;
 
@@ -68,7 +106,7 @@ CodeMirrorAdapter.languageMappings = [
 Recode.adapters.codemirror = CodeMirrorAdapter;
 module.exports = CodeMirrorAdapter;
 
-},{"./recode":5}],3:[function(require,module,exports){
+},{"./recode":6}],4:[function(require,module,exports){
 var Helper = { };
 
 // Thanks kennebec
@@ -159,7 +197,7 @@ Helper.simplifyLanguageMappings = function(map) {
 
 module.exports = Helper;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var Recode = require('./recode');
 var Helper = Recode.Helper;
 
@@ -212,7 +250,7 @@ PreAdapter.prototype.render = function() {
 Recode.adapters.pre = PreAdapter;
 module.exports = PreAdapter;
 
-},{"./recode":5}],5:[function(require,module,exports){
+},{"./recode":6}],6:[function(require,module,exports){
 var Helper = require('./helper');
 
 // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
@@ -416,10 +454,11 @@ Recode.Helper = Helper;
 Recode.TextareaAdapter = require('./textarea-adapter');
 Recode.PreAdapter = require('./pre-adapter');
 Recode.CodeMirrorAdapter = require('./codemirror-adapter');
+Recode.AceAdapter = require('./ace-adapter');
 
 
 
-},{"./codemirror-adapter":2,"./helper":3,"./pre-adapter":4,"./textarea-adapter":6}],6:[function(require,module,exports){
+},{"./ace-adapter":2,"./codemirror-adapter":3,"./helper":4,"./pre-adapter":5,"./textarea-adapter":7}],7:[function(require,module,exports){
 var Recode = require('./recode');
 var Helper = Recode.Helper;
 
@@ -467,4 +506,4 @@ TextareaAdapter.prototype.render = function() {
 Recode.adapters.textarea = TextareaAdapter;
 module.exports = TextareaAdapter;
 
-},{"./recode":5}]},{},[1]);
+},{"./recode":6}]},{},[1]);
