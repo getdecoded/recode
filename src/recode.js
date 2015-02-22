@@ -203,4 +203,6 @@ Recode.PreAdapter = require('./pre-adapter');
 Recode.CodeMirrorAdapter = require('./codemirror-adapter');
 Recode.AceAdapter = require('./ace-adapter');
 
+Recode.Recoder = require('./recoder');
+
 
