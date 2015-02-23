@@ -146,6 +146,10 @@
             }
 
             function download() {
+                var elem = document.createElement('a');
+                elem.setAttribute('href', 'data:application.json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data)));
+                elem.setAttribute('download', 'recorddata.json');
+                elem.click();
             }
 
         </script>
