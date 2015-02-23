@@ -80,27 +80,33 @@ var Recode = module.exports = function(options) {
     this.lastTimestamp = (new Date()).getTime();
     this.currentIndex = -1;
 
-    var codeTags = this.element.getElementsByTagName('code');
     var removearray = [];
     var newline = /\r\n|\n\r|\n|\r/g;
 
-    Array.prototype.forEach.call(codeTags, function(obj, num) {
-        var filepath = obj.getAttribute('data-filepath'), fileobj = { selections: [ { position: { row: 0, col: 0 }, length: { row: 0, col: 0 } } ] };
-        if (!filepath) {
-            throw new Error('<code> tag must have a data-filepath attribute');
+    this.recorddata.files.forEach(function(obj, num) {
+        var fileobj = { selections: [ { position: { row: 0, col: 0 }, length: { row: 0, col: 0 } } ] };
+        var content = '';
+        var elem;
+
+        fileobj.path = obj.path;
+        fileobj.name = obj.name;
+
+        if (obj.content != null) {
+            content = obj.content;
+        } else if (elem = document.querySelector('[data-filepath="' + fileobj.path + '"]')) {
+            content = elem.innerHTML;
+        } else {
+            throw new Error('Could not find file contents in recorddata or in element with data-filepath');
         }
 
-        fileobj.path = filepath;
-        fileobj.initialcontent = obj.innerHTML.replace(newline, '\n');
+        fileobj.initialcontent = content.replace(newline, '\n');
         fileobj.currentContent = fileobj.initialcontent;
+        fileobj.language = obj.language;
 
         self.files.push(fileobj);
-        removearray.push(obj);
     });
 
-    removearray.forEach(function(obj) {
-        obj.parentNode.removeChild(obj);
-    });
+    this.element.innerHTML = '';
 
     this.currentFile = this.files[0];
     this.adapter = new Recode.adapters[this.options.adapter](this);

@@ -66,7 +66,7 @@ CodeMirrorAdapter.prototype.changeSelection = function(position, length) {
 };
 
 CodeMirrorAdapter.prototype.changeFile = function(filepath, file) {
-    var mode = file.language || (typeof filepath === 'string') ? filepath.substring(filepath.lastIndexOf(".")+1) : '';
+    var mode = file.language || ((typeof filepath === 'string') ? filepath.substring(filepath.lastIndexOf(".")+1) : '');
 
     if (mode != '') {
         this.mode = this.languageMap[mode] || mode;
@@ -333,27 +333,33 @@ var Recode = module.exports = function(options) {
     this.lastTimestamp = (new Date()).getTime();
     this.currentIndex = -1;
 
-    var codeTags = this.element.getElementsByTagName('code');
     var removearray = [];
     var newline = /\r\n|\n\r|\n|\r/g;
 
-    Array.prototype.forEach.call(codeTags, function(obj, num) {
-        var filepath = obj.getAttribute('data-filepath'), fileobj = { selections: [ { position: { row: 0, col: 0 }, length: { row: 0, col: 0 } } ] };
-        if (!filepath) {
-            throw new Error('<code> tag must have a data-filepath attribute');
+    this.recorddata.files.forEach(function(obj, num) {
+        var fileobj = { selections: [ { position: { row: 0, col: 0 }, length: { row: 0, col: 0 } } ] };
+        var content = '';
+        var elem;
+
+        fileobj.path = obj.path;
+        fileobj.name = obj.name;
+
+        if (obj.content != null) {
+            content = obj.content;
+        } else if (elem = document.querySelector('[data-filepath="' + fileobj.path + '"]')) {
+            content = elem.innerHTML;
+        } else {
+            throw new Error('Could not find file contents in recorddata or in element with data-filepath');
         }
 
-        fileobj.path = filepath;
-        fileobj.initialcontent = obj.innerHTML.replace(newline, '\n');
+        fileobj.initialcontent = content.replace(newline, '\n');
         fileobj.currentContent = fileobj.initialcontent;
+        fileobj.language = obj.language;
 
         self.files.push(fileobj);
-        removearray.push(obj);
     });
 
-    removearray.forEach(function(obj) {
-        obj.parentNode.removeChild(obj);
-    });
+    this.element.innerHTML = '';
 
     this.currentFile = this.files[0];
     this.adapter = new Recode.adapters[this.options.adapter](this);
@@ -462,7 +468,6 @@ Recode.Recoder = require('./recoder');
 
 },{"./ace-adapter":2,"./codemirror-adapter":3,"./helper":4,"./pre-adapter":5,"./recoder":7,"./textarea-adapter":8}],7:[function(require,module,exports){
 var Recoder = function() {
-    this.currentDocument = null;
     this.recording = false;
     this.startTime = null;
     this.lastTime = null;
@@ -483,17 +488,19 @@ Recoder.prototype.addAction = function(e) {
 };
 
 Recoder.prototype.start = function() {
-    self.recording = true;
-    self.startTime = self.lastTime = Date.now();
+    this.recording = true;
+    this.startTime = this.lastTime = Date.now();
+    this.files = [];
+    this.actions = [];
 };
 
 Recoder.prototype.stop = function() {
     this.recording = false;
-    
+
     var finaldata = { };
     var compressed = Recoder.compressData(this.actions);
 
-    finaldata.files = this.trackedFileObjects;
+    finaldata.files = this.files;
     finaldata.recorded = compressed.compressed;
     finaldata.varMap = compressed.keys;
 
@@ -506,12 +513,12 @@ Recoder.compressData = function(data) {
     var compressedData = [];
     var keys = {};
     var reservedKeys = [];
-    
+
     data.forEach(function(ob, i) {
         var newob = { };
         for (var prop in ob) {
             var value = ob[prop];
-            if (typeof keys[prop] !== 'undefined') {
+            if (typeof keys[prop] === 'undefined') {
                 // Assign new key
                 var key = prop.slice(0, 1);
                 var keyIndex = 0;
@@ -536,6 +543,7 @@ Recoder.compressData = function(data) {
 };
 
 module.exports = Recoder;
+
 },{}],8:[function(require,module,exports){
 var Recode = require('./recode');
 var Helper = Recode.Helper;

@@ -20,7 +20,7 @@ CodeMirrorAdapter.prototype.changeSelection = function(position, length) {
 };
 
 CodeMirrorAdapter.prototype.changeFile = function(filepath, file) {
-    var mode = file.language || (typeof filepath === 'string') ? filepath.substring(filepath.lastIndexOf(".")+1) : '';
+    var mode = file.language || ((typeof filepath === 'string') ? filepath.substring(filepath.lastIndexOf(".")+1) : '');
 
     if (mode != '') {
         this.mode = this.languageMap[mode] || mode;

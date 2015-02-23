@@ -1,5 +1,4 @@
 var Recoder = function() {
-    this.currentDocument = null;
     this.recording = false;
     this.startTime = null;
     this.lastTime = null;
@@ -20,8 +19,10 @@ Recoder.prototype.addAction = function(e) {
 };
 
 Recoder.prototype.start = function() {
-    self.recording = true;
-    self.startTime = self.lastTime = Date.now();
+    this.recording = true;
+    this.startTime = this.lastTime = Date.now();
+    this.files = [];
+    this.actions = [];
 };
 
 Recoder.prototype.stop = function() {
@@ -30,7 +31,7 @@ Recoder.prototype.stop = function() {
     var finaldata = { };
     var compressed = Recoder.compressData(this.actions);
 
-    finaldata.files = this.trackedFileObjects;
+    finaldata.files = this.files;
     finaldata.recorded = compressed.compressed;
     finaldata.varMap = compressed.keys;
 
@@ -48,7 +49,7 @@ Recoder.compressData = function(data) {
         var newob = { };
         for (var prop in ob) {
             var value = ob[prop];
-            if (typeof keys[prop] !== 'undefined') {
+            if (typeof keys[prop] === 'undefined') {
                 // Assign new key
                 var key = prop.slice(0, 1);
                 var keyIndex = 0;
