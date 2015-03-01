@@ -1,11 +1,8 @@
 {
   "name": "Recode",
   "version": "0.0.1",
-  "description": "Pronounced like *record* but with code, instead.",
+  "description": "Playback of code typing",
   "main": "dist/recode.min.js",
-  "directories": {
-    "test": "test"
-  },
   "dependencies": {},
   "devDependencies": {
     "browserify": "^8.1.3",
