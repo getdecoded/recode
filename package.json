@@ -1,6 +1,6 @@
 {
   "name": "recode",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Playback of code typing",
   "main": "dist/recode.min.js",
   "dependencies": {},
