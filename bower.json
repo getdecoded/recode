@@ -1,6 +1,6 @@
 {
   "name": "recode",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "homepage": "https://github.com/decode-org/recode",
   "description": "Playback of code typing",
   "main": "dist/recode.js",
