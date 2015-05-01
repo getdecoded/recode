@@ -1,5 +1,5 @@
 {
-  "name": "Recode",
+  "name": "recode",
   "version": "0.0.1",
   "description": "Playback of code typing",
   "main": "dist/recode.min.js",
