@@ -1,11 +1,11 @@
 var Recode = require('./recode');
 var Helper = Recode.Helper;
 
-var CodeMirrorAdapter = function (recode) {
+var CodeMirrorAdapter = function (recode, options) {
   this.recode = recode;
 
   this.languageMap = Helper.simplifyLanguageMappings(CodeMirrorAdapter.languageMappings);
-  this.codemirror = CodeMirror(this.recode.element);
+  this.codemirror = options.codemirror || CodeMirror(this.recode.element);
   this.document = this.codemirror.getDoc();
   this.mode = '';
   this.document.setValue(recode.files[0].currentContent);

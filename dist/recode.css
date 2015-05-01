@@ -1,37 +1,37 @@
 .recode textarea {
-    display: block;
-    width: 100%;
-    height: 400px;
+  display: block;
+  width: 100%;
+  height: 400px;
 
-    font-family: Courier, monospace;
-    font-size: 1em;
-    font-size: 1rem;
+  font-family: Courier, monospace;
+  font-size: 1em;
+  font-size: 1rem;
 }
 
 .recode .recode-text {
-    display: block;
-    width: 100%;
-    height: 400px;
-    padding: 5px;
+  display: block;
+  width: 100%;
+  height: 400px;
+  padding: 5px;
 
-    background-color: #fafafa;
+  background-color: #fafafa;
 
-    font-family: Courier, monospace;
-    font-size: 1em;
-    font-size: 1rem;
+  font-family: Courier, monospace;
+  font-size: 1em;
+  font-size: 1rem;
 
-    overflow: auto;
+  overflow: auto;
 }
 
 .recode .recode-selection {
-    background: #c0c0fd;
+  background: #c0c0fd;
 }
 
 .recode .recode-caret {
-    position: absolute;
+  position: absolute;
 
-    width: 0.1em;
-    height: 1em;
+  width: 0.1em;
+  height: 1em;
 
-    background-color: #333;
+  background-color: #333;
 }

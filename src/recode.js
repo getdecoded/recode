@@ -121,18 +121,11 @@ var Recode = module.exports = function (options) {
   this.element.innerHTML = '';
 
   this.currentFile = this.files[0];
-  this.adapter = new Recode.adapters[this.options.adapter](this);
+  this.adapter = new Recode.adapters[this.options.adapter](this, this.adapterOptions || { });
 };
 
 Recode.prototype.playrender = function () {
-  var now = (new Date()).getTime(),
-    difference = now - this.lastTimestamp,
-    self = this;
-
-  this.lastTimestamp = now;
-  this.lastTime = this.currentTime;
-  this.currentTime += difference;
-
+  var self = this;
   this.render();
 
   if (this.playing) {
@@ -143,8 +136,14 @@ Recode.prototype.playrender = function () {
 };
 
 Recode.prototype.render = function () {
-  var self = this,
-    updated = false;
+  var self = this;
+  var updated = false;
+  var now = (new Date()).getTime();
+  var difference = now - this.lastTimestamp;
+
+  this.lastTimestamp = now;
+  this.lastTime = this.currentTime;
+  this.currentTime += difference;
 
   for (i = this.currentIndex + 1; i < this.recorddata.recorded.length; i++) {
     var ev = this.recorddata.recorded[i],
