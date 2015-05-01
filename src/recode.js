@@ -124,9 +124,21 @@ var Recode = module.exports = function (options) {
   this.adapter = new Recode.adapters[this.options.adapter](this, this.adapterOptions || { });
 };
 
+Recode.prototype.setTime = function (time) {
+  this.lastTime = this.currentTime;
+  this.currentTime = time;
+
+  this.render();
+};
+
 Recode.prototype.playrender = function () {
   var self = this;
-  this.render();
+  var now = (new Date()).getTime();
+  var difference = now - this.lastTimestamp;
+
+  this.lastTimestamp = now;
+
+  this.setTime(this.currentTime + difference);
 
   if (this.playing) {
     this.requestid = requestAnimationFrame(function () {
@@ -138,12 +150,6 @@ Recode.prototype.playrender = function () {
 Recode.prototype.render = function () {
   var self = this;
   var updated = false;
-  var now = (new Date()).getTime();
-  var difference = now - this.lastTimestamp;
-
-  this.lastTimestamp = now;
-  this.lastTime = this.currentTime;
-  this.currentTime += difference;
 
   for (i = this.currentIndex + 1; i < this.recorddata.recorded.length; i++) {
     var ev = this.recorddata.recorded[i],
