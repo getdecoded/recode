@@ -5,12 +5,14 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var server = require('gulp-webserver');
 var autoprefixer = require('gulp-autoprefixer');
+var derequire = require('gulp-derequire');
 
 gulp.task('js', function () {
   browserify('./src/index.js', {standalone: 'Recode'})
     .transform(debowerify)
     .bundle()
     .pipe(source('recode.js'))
+    .pipe(derequire())
     .pipe(buffer())
     .pipe(gulp.dest('./dist'));
 });

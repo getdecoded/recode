@@ -1,11 +1,11 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Recode=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Recode = require('./recode');
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Recode=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+var Recode = _dereq_('./recode');
 module.exports = Recode;
 
 
 
-},{"./recode":6}],2:[function(require,module,exports){
-var Recode = require('./recode');
+},{"./recode":6}],2:[function(_dereq_,module,exports){
+var Recode = _dereq_('./recode');
 var Helper = Recode.Helper;
 
 var AceAdapter = function (recode) {
@@ -42,8 +42,8 @@ AceAdapter.prototype.render = function () {
 Recode.adapters.ace = AceAdapter;
 module.exports = AceAdapter;
 
-},{"./recode":6}],3:[function(require,module,exports){
-var Recode = require('./recode');
+},{"./recode":6}],3:[function(_dereq_,module,exports){
+var Recode = _dereq_('./recode');
 var Helper = Recode.Helper;
 
 var CodeMirrorAdapter = function (recode, options) {
@@ -111,7 +111,7 @@ CodeMirrorAdapter.languageMappings = [
 Recode.adapters.codemirror = CodeMirrorAdapter;
 module.exports = CodeMirrorAdapter;
 
-},{"./recode":6}],4:[function(require,module,exports){
+},{"./recode":6}],4:[function(_dereq_,module,exports){
 var Helper = {};
 
 // Thanks kennebec
@@ -207,8 +207,8 @@ Helper.simplifyLanguageMappings = function (map) {
 
 module.exports = Helper;
 
-},{}],5:[function(require,module,exports){
-var Recode = require('./recode');
+},{}],5:[function(_dereq_,module,exports){
+var Recode = _dereq_('./recode');
 var Helper = Recode.Helper;
 
 var PreAdapter = function (recode) {
@@ -259,8 +259,8 @@ PreAdapter.prototype.render = function () {
 Recode.adapters.pre = PreAdapter;
 module.exports = PreAdapter;
 
-},{"./recode":6}],6:[function(require,module,exports){
-var Helper = require('./helper');
+},{"./recode":6}],6:[function(_dereq_,module,exports){
+var Helper = _dereq_('./helper');
 
 // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
 
@@ -485,14 +485,14 @@ Recode.defaultOptions = {
 };
 Recode.Helper = Helper;
 
-Recode.TextareaAdapter = require('./textarea-adapter');
-Recode.PreAdapter = require('./pre-adapter');
-Recode.CodeMirrorAdapter = require('./codemirror-adapter');
-Recode.AceAdapter = require('./ace-adapter');
+Recode.TextareaAdapter = _dereq_('./textarea-adapter');
+Recode.PreAdapter = _dereq_('./pre-adapter');
+Recode.CodeMirrorAdapter = _dereq_('./codemirror-adapter');
+Recode.AceAdapter = _dereq_('./ace-adapter');
 
-Recode.Recoder = require('./recoder');
+Recode.Recoder = _dereq_('./recoder');
 
-},{"./ace-adapter":2,"./codemirror-adapter":3,"./helper":4,"./pre-adapter":5,"./recoder":7,"./textarea-adapter":8}],7:[function(require,module,exports){
+},{"./ace-adapter":2,"./codemirror-adapter":3,"./helper":4,"./pre-adapter":5,"./recoder":7,"./textarea-adapter":8}],7:[function(_dereq_,module,exports){
 var Recoder = function () {
   this.recording = false;
   this.startTime = null;
@@ -570,8 +570,8 @@ Recoder.compressData = function (data) {
 
 module.exports = Recoder;
 
-},{}],8:[function(require,module,exports){
-var Recode = require('./recode');
+},{}],8:[function(_dereq_,module,exports){
+var Recode = _dereq_('./recode');
 var Helper = Recode.Helper;
 
 var TextareaAdapter = function (recode) {
