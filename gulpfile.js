@@ -7,10 +7,11 @@ var server = require('gulp-webserver');
 var autoprefixer = require('gulp-autoprefixer');
 
 gulp.task('js', function () {
-  browserify('./src/index.js')
+  browserify('./src/index.js', {standalone: 'Recode'})
     .transform(debowerify)
     .bundle()
     .pipe(source('recode.js'))
+    .pipe(buffer())
     .pipe(gulp.dest('./dist'));
 });
 
