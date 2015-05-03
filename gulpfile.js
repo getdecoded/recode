@@ -8,7 +8,10 @@ var autoprefixer = require('gulp-autoprefixer');
 var derequire = require('gulp-derequire');
 
 gulp.task('js', function () {
-  browserify('./src/index.js', {standalone: 'Recode'})
+  browserify('./src/index.js', {
+      standalone: 'Recode'
+    })
+    .external('codemirror')
     .transform(debowerify)
     .bundle()
     .pipe(source('recode.js'))
