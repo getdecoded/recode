@@ -28,6 +28,7 @@ if (canCodeMirror) {
     this.codemirror = options.codemirror || CodeMirror(this.recode.element);
     this.document = this.codemirror.getDoc();
     this.mode = '';
+    console.log(recode.files[0]);
     this.document.setValue(recode.files[0].currentContent);
   };
 

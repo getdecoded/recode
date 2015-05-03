@@ -111,8 +111,8 @@ var Recode = module.exports = function (options) {
       throw new Error('Could not find file contents in recorddata or in element with data-filepath');
     }
 
-    fileobj.initialcontent = content.replace(newline, '\n');
-    fileobj.currentContent = fileobj.initialcontent;
+    fileobj.initialContent = content.replace(newline, '\n');
+    fileobj.currentContent = fileobj.initialContent;
     fileobj.language = obj.language;
 
     self.files.push(fileobj);
@@ -150,6 +150,16 @@ Recode.prototype.playrender = function () {
 Recode.prototype.render = function () {
   var self = this;
   var updated = false;
+
+  // Start again if we're going backwards
+  // TODO: Make this code smarter
+  if (this.currentTime < this.lastActionTime) {
+    this.lastActionTime = 0;
+    this.currentIndex = 0;
+    this.files.forEach(function(file) {
+      file.currentContent = file.initialContent;
+    });
+  }
 
   for (i = this.currentIndex + 1; i < this.recorddata.recorded.length; i++) {
     var ev = this.recorddata.recorded[i],
