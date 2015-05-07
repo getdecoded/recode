@@ -402,10 +402,14 @@ var Recode = module.exports = function (options) {
     self.files.push(fileobj);
   });
 
-  this.element.innerHTML = '';
+  [].slice.call(this.element.querySelectorAll('pre,p')).forEach(function (element) {
+    if (element.parentNode === this.element) {
+      this.element.removeChild(element);
+    }
+  }.bind(this));
 
   this.currentFile = this.files[0];
-  this.adapter = new Recode.adapters[this.options.adapter](this, this.adapterOptions || { });
+  this.adapter = new Recode.adapters[this.options.adapter](this, this.options.adapterOptions || { });
 };
 
 Recode.prototype.setTime = function (time) {
