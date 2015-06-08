@@ -413,7 +413,7 @@ var Recode = module.exports = function (options) {
 };
 
 Recode.prototype.setTime = function (time) {
-  this.lastTime = this.currentTime;
+  // this.lastActionTime = this.currentTime;
   this.currentTime = time;
 
   this.render();
@@ -442,8 +442,9 @@ Recode.prototype.render = function () {
   // Start again if we're going backwards
   // TODO: Make this code smarter
   if (this.currentTime < this.lastActionTime) {
+    updated = true;
     this.lastActionTime = 0;
-    this.currentIndex = 0;
+    this.currentIndex = -1;
     this.files.forEach(function(file) {
       file.currentContent = file.initialContent;
     });
