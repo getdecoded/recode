@@ -30,6 +30,14 @@ var Helper = require('./helper');
     };
 }());
 
+
+/**
+ * The Recode object is responsible for playback of recordings but not for rendering
+ *
+ * @param {Object} options - options hash. Must contain "element" and "recorddata"
+ *
+ * @constructor Recode
+ */
 var Recode = module.exports = function (options) {
   if (!options.element) {
     throw new Error('Must supply element in Recode options');
@@ -128,6 +136,11 @@ var Recode = module.exports = function (options) {
   this.adapter = new Recode.adapters[this.options.adapter](this, this.options.adapterOptions || { });
 };
 
+/**
+ * Sets the current time
+ *
+ * @param {Number} time - The time in seconds
+ */
 Recode.prototype.setTime = function (time) {
   // this.lastActionTime = this.currentTime;
   this.currentTime = time;
@@ -135,6 +148,9 @@ Recode.prototype.setTime = function (time) {
   this.render();
 };
 
+/**
+ * @private
+ */
 Recode.prototype.playrender = function () {
   var self = this;
   var now = (new Date()).getTime();
@@ -151,6 +167,9 @@ Recode.prototype.playrender = function () {
   }
 };
 
+/**
+ * Determine what state the files should be in, and pass to adapters for rendering
+ */
 Recode.prototype.render = function () {
   var self = this;
   var updated = false;
@@ -217,6 +236,9 @@ Recode.prototype.render = function () {
 
 };
 
+/**
+ * Start playback
+ */
 Recode.prototype.play = function () {
   var self = this;
   this.playing = true;
@@ -226,6 +248,9 @@ Recode.prototype.play = function () {
   });
 };
 
+/**
+ * Pause playback at current time
+ */
 Recode.prototype.pause = function () {
   this.playing = false;
   cancelAnimationFrame(this.requestid);
