@@ -28,6 +28,7 @@ if (canCodeMirror) {
     this.codemirror = options.codemirror || CodeMirror(this.recode.element);
     this.document = this.codemirror.getDoc();
     this.mode = '';
+    this.lastVal = '';
     console.log(recode.files[0]);
     this.document.setValue(recode.files[0].currentContent);
   };
@@ -50,8 +51,12 @@ if (canCodeMirror) {
   };
 
   CodeMirrorAdapter.prototype.render = function () {
-    this.document.setValue(this.recode.currentFile.currentContent);
     var file = this.recode.currentFile;
+
+    if (this.lastVal != file.currentContent) {
+      this.document.setValue(file.currentContent);
+      this.lastVal = file.currentContent;
+    }
 
     var pos = file.selections[0].position,
       len = file.selections[0].length,
