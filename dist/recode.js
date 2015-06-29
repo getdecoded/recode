@@ -73,6 +73,7 @@ if (canCodeMirror) {
     this.codemirror = options.codemirror || CodeMirror(this.recode.element);
     this.document = this.codemirror.getDoc();
     this.mode = '';
+    this.lastVal = '';
     console.log(recode.files[0]);
     this.document.setValue(recode.files[0].currentContent);
   };
@@ -95,8 +96,12 @@ if (canCodeMirror) {
   };
 
   CodeMirrorAdapter.prototype.render = function () {
-    this.document.setValue(this.recode.currentFile.currentContent);
     var file = this.recode.currentFile;
+
+    if (this.lastVal != file.currentContent) {
+      this.document.setValue(file.currentContent);
+      this.lastVal = file.currentContent;
+    }
 
     var pos = file.selections[0].position,
       len = file.selections[0].length,
@@ -314,6 +319,14 @@ var Helper = _dereq_('./helper');
     };
 }());
 
+
+/**
+ * The Recode object is responsible for playback of recordings but not for rendering
+ *
+ * @param {Object} options - options hash. Must contain "element" and "recorddata"
+ *
+ * @constructor Recode
+ */
 var Recode = module.exports = function (options) {
   if (!options.element) {
     throw new Error('Must supply element in Recode options');
@@ -412,6 +425,11 @@ var Recode = module.exports = function (options) {
   this.adapter = new Recode.adapters[this.options.adapter](this, this.options.adapterOptions || { });
 };
 
+/**
+ * Sets the current time
+ *
+ * @param {Number} time - The time in seconds
+ */
 Recode.prototype.setTime = function (time) {
   // this.lastActionTime = this.currentTime;
   this.currentTime = time;
@@ -419,6 +437,9 @@ Recode.prototype.setTime = function (time) {
   this.render();
 };
 
+/**
+ * @private
+ */
 Recode.prototype.playrender = function () {
   var self = this;
   var now = (new Date()).getTime();
@@ -435,6 +456,9 @@ Recode.prototype.playrender = function () {
   }
 };
 
+/**
+ * Determine what state the files should be in, and pass to adapters for rendering
+ */
 Recode.prototype.render = function () {
   var self = this;
   var updated = false;
@@ -501,6 +525,9 @@ Recode.prototype.render = function () {
 
 };
 
+/**
+ * Start playback
+ */
 Recode.prototype.play = function () {
   var self = this;
   this.playing = true;
@@ -510,6 +537,9 @@ Recode.prototype.play = function () {
   });
 };
 
+/**
+ * Pause playback at current time
+ */
 Recode.prototype.pause = function () {
   this.playing = false;
   cancelAnimationFrame(this.requestid);
@@ -530,6 +560,11 @@ Recode.AceAdapter = _dereq_('./ace-adapter');
 Recode.Recoder = _dereq_('./recoder');
 
 },{"./ace-adapter":2,"./codemirror-adapter":3,"./helper":4,"./pre-adapter":5,"./recoder":7,"./textarea-adapter":8}],7:[function(_dereq_,module,exports){
+/**
+ * Very light object for recording typing of code and giving a Recode compatible schema
+ *
+ * @constructor Recoder
+ */
 var Recoder = function () {
   this.recording = false;
   this.startTime = null;
@@ -538,6 +573,13 @@ var Recoder = function () {
   this.actions = [];
 };
 
+/**
+ * Adds a code action to the list. See schema file for examples of this
+ * Time between this and previous action will be calculated automatically
+ * But can be overriden by setting the distance property of the action
+ *
+ * @param {Object} e - Object to define action
+ */
 Recoder.prototype.addAction = function (e) {
   var now = Date.now();
   var difference = now - this.lastTime;
@@ -550,6 +592,9 @@ Recoder.prototype.addAction = function (e) {
   this.actions.push(e);
 };
 
+/**
+ * Start recording. Must be called before addAction
+ */
 Recoder.prototype.start = function () {
   this.recording = true;
   this.startTime = this.lastTime = Date.now();
@@ -557,6 +602,11 @@ Recoder.prototype.start = function () {
   this.actions = [];
 };
 
+/**
+ * Stop recording and create a compressed recordData object
+ *
+ * @return {Object}
+ */
 Recoder.prototype.stop = function () {
   this.recording = false;
 
@@ -572,6 +622,12 @@ Recoder.prototype.stop = function () {
 
 Recoder.allowedCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRS0123456789';
 
+/**
+ * Given a Recode compatible object, compress it down by converting string names into
+ * single letter keys
+ *
+ * @memberof Recoder
+ */
 Recoder.compressData = function (data) {
   var compressedData = [];
   var keys = {};
